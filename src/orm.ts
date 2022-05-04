@@ -1,0 +1,24 @@
+import { DataSource } from 'typeorm';
+import { User } from './Entities/User.entity';
+import { Task } from './Entities/Task.entity';
+import { Comment } from './Entities/Comment.entity';
+
+const orm = new DataSource({
+    type: 'mongodb',
+    url: encodeURI(`mongodb+srv://${encodeURIComponent('user_1')}:${encodeURIComponent('user_1')}@fe-school-cluster.bnhye.mongodb.net/school`),
+    useNewUrlParser: true,
+    synchronize: true,
+    logging: true,
+    entities: [User, Task, Comment],
+    retryWrites: true,
+    family: 4,
+    useUnifiedTopology: true,
+    w: 'majority',
+});
+
+orm.initialize()
+    .then(() => {
+        console.log('db initialized')
+    });
+
+export default orm;

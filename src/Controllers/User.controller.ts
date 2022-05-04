@@ -5,28 +5,20 @@ import {
     Put,
     Path,
     Post,
-    // Query,
     Route,
     Tags,
-    
-    
-    // SuccessResponse,
+    Response,
 } from 'tsoa';
 
-/** Модель авторизации */
-interface UserCredentional {
-    /** Логин пользователя */
-    login: string;
-    /** Пароль */
-    password: string;
-}
+import { UserFilter, QueryDTO, ListDTO } from '../Models/Common.model';
+import { UserDTO, LoginDTO, UserWithCredsDTO } from '../Models/User.model';
+import { User } from '../Entities/User.entity';
+import orm from '../orm';
+import { ObjectId } from 'mongodb';
+import { castArray } from 'lodash';
+import { FindManyOptions } from 'typeorm';
 
-interface User {
-    login: string;
-    username: string;
-    photoUrl?: string;
-    about?: string;
-}
+const { manager } = orm;
 
 /** Пользователи */
 @Route('users')
@@ -34,49 +26,193 @@ interface User {
 export class UserController extends Controller{
     /** Получение списка пользователей по фильтру */
     @Post()
-    public async getByFilter(): Promise<void> {
-        return;
-    }
+    public async getByFilter(
+        @Body() body: QueryDTO<UserFilter>
+    ): Promise<ListDTO<UserDTO>> {
+        const { filter, page = 0, limit = 10 } = body;
+        const { query } = filter;
 
-    /** Получение пользователя по id */
-    @Get(':id')
-    public async getById(
-        @Path('id') id: string,
-    ): Promise<User> {
-        console.log(id);
+        const repo = manager.getMongoRepository(User);
+
+        const findOptions: FindManyOptions<User> = {
+            where: {},
+            skip: page * limit,
+            take: limit,
+        }
+
+        if (query) {
+            findOptions.where = {
+                ...findOptions.where,
+                username: new RegExp(`${query}`, 'i') as never
+            }
+        }
+
+        const [data, total] = await repo.findAndCount(findOptions)
 
         return {
-            login: id,
-            username: 'testUsername',
-            photoUrl: 'testPhoto',
-            about: 'testAbout',
+            data: castArray(data).filter(Boolean),
+            page: page || 0,
+            limit: limit || 0,
+            total: total || 0,
         };
     }
 
     /** Получение списка всех пользователей */
     @Get('all')
-    public async getAll(): Promise<void> {
-        return;
+    public async getAll(): Promise<Array<UserDTO>> {
+        const _users = await manager.find(User);
+
+        const users = castArray(_users).filter(Boolean).map(x => {
+            return {
+                id: x.id,
+                username: x.username,
+                login: x.login,
+                about: x.about || null as never,
+                photoUrl: x.photoUrl || null as never,
+            }
+        })
+
+        return users;
+    }
+
+    /** Получение пользователя по id */
+    @Get(':id')
+    @Response<{ message: string }>(400, "Request Error", {
+        message: "Текст ошибки",
+    })
+    public async getById(
+        @Path('id') id: string,
+    ): Promise<UserDTO> {
+        if (!id) {
+            this.setStatus(400);
+            return {
+                message: 'Пользователь не указан'
+            } as never;
+        }
+
+        const user = await manager.findOneBy(User, {
+            _id: new ObjectId(id) as never,
+        } as never);
+
+        if (user) {
+            return {
+                id: user.id,
+                username: user.username,
+                login: user.login,
+                about: user.about || null as never,
+                photoUrl: user.photoUrl || null as never,
+            }
+        }
+
+        return null as never;
     }
 
     /** Редактирование пользователя */
     @Put('edit')
-    public async edit(): Promise<void> {
-        return;
+    @Response<{ message: string }>(400, "Request Error", {
+        message: "Текст ошибки",
+    })
+    @Response<{ message: string }>(500, "Internal Server Error", {
+        message: "Текст ошибки",
+    })
+    public async edit(
+        @Body() user: UserDTO & LoginDTO,
+    ): Promise<UserDTO> {
+        if (!(user.login || user.username)) {
+            this.setStatus(400);
+            return {
+                message: 'Не указаны обязательные поля'
+            } as never;
+        }
+
+        let _user: User;
+
+        if (user.id) {
+            const match = await manager.findOneBy(User, {
+                _id: new ObjectId(user.id) as never
+            } as never)
+
+            if (match) {
+                _user = match;
+            } else {
+                this.setStatus(400);
+                return {
+                    message: 'Пользователь не найден'
+                }as never;
+            }
+        } else {
+            _user = new User();
+
+            if (!(<UserWithCredsDTO>user).password) {
+                this.setStatus(400);
+                return {
+                    message: 'Не указан пароль'
+                } as never;
+            }
+
+            _user.password = (<UserWithCredsDTO>user).password
+            _user.login = (<UserWithCredsDTO>user).login
+            _user.username = (<UserWithCredsDTO>user).username
+        }
+
+        _user.about = user.about || ''
+        _user.photoUrl = user.photoUrl || ''
+
+        try {
+            await manager.save(_user);
+        } catch (e) {
+            this.setStatus(500)
+            return {
+                message: 'Произошла ошибка сохранения пользователя',
+            } as never
+        }
+
+        return {
+            id: _user.id,
+            username: _user.username,
+            login: _user.login,
+            about: _user.about || null as never,
+            photoUrl: _user.photoUrl || null as never,
+        };
     }
 
     /** Авторизация пользователя */
     @Post('login')
+    @Response<{ message: string }>(400, "Request Error", {
+        message: "Текст ошибки",
+    })
+    @Response<{ message: string }>(401, "Auth", {
+        message: "Текст ошибки",
+    })
     public async login(
-        @Body() credential: UserCredentional
-    ): Promise<User>{
-        console.log(credential)
+        @Body() credential: LoginDTO,
+    ): Promise<UserDTO>{
+        if (!(credential.login || credential.password)) {
+            this.setStatus(400)
+            return {
+                message: 'Не указан логин или пароль'
+            }as never;
+        }
+
+        // /** Не используейте это в реальных проектах */
+        const user = await manager.findOneBy(User, {
+            login: credential.login,
+            password: credential.password,
+        })
+
+        if (!user) {
+            this.setStatus(401);
+            return {
+                message: 'Неправильный логин или пароль'
+            }as never;
+        }
 
         return {
-            login: 'testlogin',
-            username: 'testUsername',
-            photoUrl: 'testPhoto',
-            about: 'testAbout',
+            id: user.id,
+            username: user.username,
+            login: user.login,
+            about: user.about || null as never,
+            photoUrl: user.photoUrl || null as never,
         };
     }
 }
