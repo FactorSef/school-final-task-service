@@ -5,7 +5,7 @@ import { Comment } from './Entities/Comment.entity';
 
 const orm = new DataSource({
     type: 'mongodb',
-    url: encodeURI(`mongodb+srv://${encodeURIComponent('user_1')}:${encodeURIComponent('user_1')}@fe-school-cluster.bnhye.mongodb.net/school`),
+    url: encodeURI(`mongodb+srv://${encodeURIComponent((process.env as any).MONGOUSR)}:${encodeURIComponent((process.env as any).MONGOPASS)}@fe-school-cluster.bnhye.mongodb.net/school`),
     useNewUrlParser: true,
     synchronize: true,
     logging: true,
