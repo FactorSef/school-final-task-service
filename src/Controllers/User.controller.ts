@@ -134,6 +134,10 @@ export class UserController extends Controller{
 
             if (match) {
                 _user = match;
+
+                if (user.password && user.password !== _user.password) {
+                    _user.password = user.password
+                }
             } else {
                 this.setStatus(400);
                 return {
