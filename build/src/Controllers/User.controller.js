@@ -112,6 +112,9 @@ let UserController = class UserController extends tsoa_1.Controller {
                 });
                 if (match) {
                     _user = match;
+                    if (user.password && user.password !== _user.password) {
+                        _user.password = user.password;
+                    }
                 }
                 else {
                     this.setStatus(400);
