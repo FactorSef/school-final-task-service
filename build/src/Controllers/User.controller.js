@@ -184,6 +184,30 @@ let UserController = class UserController extends tsoa_1.Controller {
             };
         });
     }
+    /** Удаление пользователя по id */
+    delete(
+    /** id пользователя */
+    id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!id) {
+                this.setStatus(400);
+                return {
+                    message: 'Пользователь не указан'
+                };
+            }
+            const user = yield manager.findOneBy(User_entity_1.User, {
+                _id: new mongodb_1.ObjectId(id),
+            });
+            if (!user) {
+                this.setStatus(400);
+                return {
+                    message: 'Пользователь не найден'
+                };
+            }
+            yield manager.remove(user);
+            return id;
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Post)(),
@@ -234,6 +258,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "login", null);
+__decorate([
+    (0, tsoa_1.Delete)(':userId'),
+    (0, tsoa_1.Response)(400, "Request Error", {
+        message: "Текст ошибки",
+    }),
+    __param(0, (0, tsoa_1.Path)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "delete", null);
 UserController = __decorate([
     (0, tsoa_1.Route)('users'),
     (0, tsoa_1.Tags)('Users')

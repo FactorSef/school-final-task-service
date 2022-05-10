@@ -53,7 +53,7 @@ export class TaskController extends Controller{
         if (!isEmpty(assignedUsers)) {
             findOptions.where = {
                 ...findOptions.where,
-                title: { $in: assignedUsers } as never,
+                assignedId: { $in: assignedUsers } as never,
             }
         }
 

@@ -50,7 +50,7 @@ let TaskController = class TaskController extends tsoa_1.Controller {
                 findOptions.where = Object.assign(Object.assign({}, findOptions.where), { title: new RegExp(`${query}`, 'i') });
             }
             if (!(0, lodash_1.isEmpty)(assignedUsers)) {
-                findOptions.where = Object.assign(Object.assign({}, findOptions.where), { title: { $in: assignedUsers } });
+                findOptions.where = Object.assign(Object.assign({}, findOptions.where), { assignedId: { $in: assignedUsers } });
             }
             if (!(0, lodash_1.isEmpty)(userIds)) {
                 findOptions.where = Object.assign(Object.assign({}, findOptions.where), { userId: { $in: userIds } });

@@ -8,6 +8,7 @@ import {
     Route,
     Tags,
     Response,
+    Delete,
 } from 'tsoa';
 
 import { UserFilter, QueryDTO, ListDTO } from '../Models/Common.model';
@@ -218,5 +219,37 @@ export class UserController extends Controller{
             about: user.about || null as never,
             photoUrl: user.photoUrl || null as never,
         };
+    }
+
+    /** Удаление пользователя по id */
+    @Delete(':userId')
+    @Response<{ message: string }>(400, "Request Error", {
+        message: "Текст ошибки",
+    })
+    public async delete(
+        /** id пользователя */
+        @Path('userId') id: string,
+    ): Promise<string> {
+        if (!id) {
+            this.setStatus(400);
+            return {
+                message: 'Пользователь не указан'
+            } as never;
+        }
+
+        const user = await manager.findOneBy(User, {
+            _id: new ObjectId(id) as never,
+        } as never);
+        
+        if (!user) {
+            this.setStatus(400);
+            return {
+                message: 'Пользователь не найден'
+            } as never;
+        }
+
+        await manager.remove(user);
+
+        return id;
     }
 }

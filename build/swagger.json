@@ -129,19 +129,23 @@
 						"items": {
 							"$ref": "#/components/schemas/TaskDTO"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "Результат"
 					},
 					"page": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Номер страницы"
 					},
 					"limit": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Кол-во элементов на странице"
 					},
 					"total": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Всего записей по фильтру"
 					}
 				},
 				"required": [
@@ -156,37 +160,43 @@
 			"TaskFilter": {
 				"properties": {
 					"query": {
-						"type": "string"
+						"type": "string",
+						"description": "Заголовок"
 					},
 					"assignedUsers": {
 						"items": {
 							"type": "string"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "id исполнителя"
 					},
 					"userIds": {
 						"items": {
 							"type": "string"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "id создателя задачи"
 					},
 					"type": {
 						"items": {
 							"$ref": "#/components/schemas/TaskTypeEnum"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "Тип задачи"
 					},
 					"status": {
 						"items": {
 							"$ref": "#/components/schemas/TaskStatusEnum"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "Статус задачи"
 					},
 					"rank": {
 						"items": {
 							"$ref": "#/components/schemas/TaskRankEnum"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "Приоритет задачи"
 					}
 				},
 				"type": "object",
@@ -195,15 +205,18 @@
 			"QueryDTO_TaskFilter_": {
 				"properties": {
 					"filter": {
-						"$ref": "#/components/schemas/TaskFilter"
+						"$ref": "#/components/schemas/TaskFilter",
+						"description": "Фильтр"
 					},
 					"page": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Номер страницы (начиная с нуля)"
 					},
 					"limit": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Кол-во элементов на странице"
 					}
 				},
 				"required": [
@@ -294,19 +307,23 @@
 						"items": {
 							"$ref": "#/components/schemas/UserDTO"
 						},
-						"type": "array"
+						"type": "array",
+						"description": "Результат"
 					},
 					"page": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Номер страницы"
 					},
 					"limit": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Кол-во элементов на странице"
 					},
 					"total": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Всего записей по фильтру"
 					}
 				},
 				"required": [
@@ -322,7 +339,8 @@
 				"properties": {
 					"query": {
 						"type": "string",
-						"nullable": true
+						"nullable": true,
+						"description": "Имя пользоваетля"
 					}
 				},
 				"type": "object",
@@ -331,15 +349,18 @@
 			"QueryDTO_UserFilter_": {
 				"properties": {
 					"filter": {
-						"$ref": "#/components/schemas/UserFilter"
+						"$ref": "#/components/schemas/UserFilter",
+						"description": "Фильтр"
 					},
 					"page": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Номер страницы (начиная с нуля)"
 					},
 					"limit": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "Кол-во элементов на странице"
 					}
 				},
 				"required": [
@@ -1108,6 +1129,64 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/{userId}": {
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Request Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"message": "Текст ошибки"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Удаление пользователя по id",
+				"tags": [
+					"Users"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "id пользователя",
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},
