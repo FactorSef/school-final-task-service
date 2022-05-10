@@ -50,7 +50,6 @@ let CommentController = class CommentController extends tsoa_1.Controller {
                     taskId: id,
                 }
             });
-            console.log(yield manager.find(Comment_entity_1.Comment));
             return (0, lodash_1.castArray)(comments).filter(Boolean);
         });
     }
@@ -99,10 +98,7 @@ let CommentController = class CommentController extends tsoa_1.Controller {
                     message: 'Комментарий не найден'
                 };
             }
-            const repo = manager.getMongoRepository(Comment_entity_1.Comment);
-            yield repo.delete({
-                _id: new mongodb_1.ObjectId(id),
-            });
+            yield manager.remove(comment);
             return id;
         });
     }

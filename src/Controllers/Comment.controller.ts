@@ -46,8 +46,6 @@ export class CommentController extends Controller{
             }
         })
 
-        console.log(await manager.find(Comment))
-
         return castArray(comments).filter(Boolean);
     }
 
@@ -106,11 +104,7 @@ export class CommentController extends Controller{
             } as never;
         }
 
-        const repo = manager.getMongoRepository(Comment);
-
-        await repo.delete({
-            _id: new ObjectId(id) as never,
-        } as never);
+        await manager.remove(comment);
 
         return id;
     }

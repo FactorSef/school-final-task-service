@@ -202,10 +202,7 @@ let TaskController = class TaskController extends tsoa_1.Controller {
                     message: 'Задача не найдена'
                 };
             }
-            const repo = manager.getMongoRepository(Task_entity_1.Task);
-            yield repo.delete({
-                _id: new mongodb_1.ObjectId(id),
-            });
+            yield manager.remove(task);
             return id;
         });
     }

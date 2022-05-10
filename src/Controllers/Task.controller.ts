@@ -259,11 +259,7 @@ export class TaskController extends Controller{
             } as never;
         }
 
-        const repo = manager.getMongoRepository(Task);
-
-        await repo.delete({
-            _id: new ObjectId(id) as never,
-        } as never)
+        await manager.remove(task);
 
         return id;
     }
