@@ -131,10 +131,10 @@ let UserController = class UserController extends tsoa_1.Controller {
                         message: 'Не указан пароль'
                     };
                 }
-                _user.password = user.password;
                 _user.login = user.login;
-                _user.username = user.username;
+                _user.password = user.password;
             }
+            _user.username = user.username || '';
             _user.about = user.about || '';
             _user.photoUrl = user.photoUrl || '';
             try {

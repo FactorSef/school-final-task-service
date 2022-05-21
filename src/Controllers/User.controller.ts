@@ -155,11 +155,11 @@ export class UserController extends Controller{
                 } as never;
             }
 
-            _user.password = (<UserWithCredsDTO>user).password
             _user.login = (<UserWithCredsDTO>user).login
-            _user.username = (<UserWithCredsDTO>user).username
+            _user.password = (<UserWithCredsDTO>user).password
         }
 
+        _user.username = user.username || ''
         _user.about = user.about || ''
         _user.photoUrl = user.photoUrl || ''
 
