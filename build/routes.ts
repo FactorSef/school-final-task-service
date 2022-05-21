@@ -20,6 +20,8 @@ const models: TsoaRoute.Models = {
             "taskId": {"dataType":"string","required":true},
             "userId": {"dataType":"string","required":true},
             "text": {"dataType":"string","required":true},
+            "dateOfCreation": {"dataType":"datetime"},
+            "dateOfUpdate": {"dataType":"datetime"},
         },
         "additionalProperties": false,
     },

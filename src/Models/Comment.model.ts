@@ -8,4 +8,8 @@ export interface CommentDTO {
     userId: string;
     /** Текст комментария */
     text: string;
+    /** Дата создания */
+    dateOfCreation?: Date;
+    /** Дата обновления */
+    dateOfUpdate?: Date;
 }

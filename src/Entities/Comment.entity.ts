@@ -1,5 +1,5 @@
 import { CommentDTO } from "../Models/Comment.model";
-import { Entity, ObjectIdColumn, Column } from "typeorm";
+import { Entity, ObjectIdColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Comment implements CommentDTO {
@@ -11,4 +11,8 @@ export class Comment implements CommentDTO {
     userId: string;
     @Column()
     text: string;
+    @CreateDateColumn()
+    dateOfCreation: Date;
+    @UpdateDateColumn()
+    dateOfUpdate: Date;
 }

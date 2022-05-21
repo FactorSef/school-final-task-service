@@ -29,6 +29,14 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Comment.prototype, "text", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Comment.prototype, "dateOfCreation", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Comment.prototype, "dateOfUpdate", void 0);
 Comment = __decorate([
     (0, typeorm_1.Entity)()
 ], Comment);
